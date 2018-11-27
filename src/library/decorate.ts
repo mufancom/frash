@@ -4,8 +4,8 @@ export function decorate<T>(
     [P in keyof T]?:
       | MethodDecorator
       | PropertyDecorator
-      | Array<MethodDecorator>
-      | Array<PropertyDecorator>
+      | MethodDecorator[]
+      | PropertyDecorator[]
   },
 ): void;
 export function decorate<T>(
@@ -14,12 +14,11 @@ export function decorate<T>(
     [P in keyof T]?:
       | MethodDecorator
       | PropertyDecorator
-      | Array<MethodDecorator>
-      | Array<PropertyDecorator>
+      | MethodDecorator[]
+      | PropertyDecorator[]
   },
 ): T;
-
-export function decorate(thing: any, decorators: any) {
+export function decorate(thing: any, decorators: any): any {
   let target = typeof thing === 'function' ? thing.prototype : thing;
 
   for (let prop in decorators) {
@@ -36,7 +35,9 @@ export function decorate(thing: any, decorators: any) {
       descriptor,
     );
 
-    if (newDescriptor) Object.defineProperty(target, prop, newDescriptor);
+    if (newDescriptor) {
+      Object.defineProperty(target, prop, newDescriptor);
+    }
   }
 
   return thing;
