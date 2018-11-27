@@ -1,0 +1,51 @@
+{
+  "name": "frash",
+  "version": "0.0.1",
+  "publishConfig": {
+    "access": "public"
+  },
+  "description": "The memory-based reactive and persistent cache library for Node.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/makeflow/frash"
+  },
+  "author": {
+    "name": "Chengdu Mufan Technology Co., Ltd.",
+    "email": "zengziyang@mufan.com"
+  },
+  "keywords": [
+    "cache",
+    "nodejs",
+    "reactive",
+    "persistent"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "build:library": "tslint -p src/library && rimraf bld/library && tsc -p src/library",
+    "typecheck:test": "tsc -p test",
+    "lint:library": "tslint -p src/library",
+    "lint:test": "tslint -p test",
+    "test:library": "yarn build:library && yarn lint:library && jest --detectOpenHandles",
+    "test:test": "yarn typecheck:test && yarn lint:test",
+    "test": "yarn test:library && yarn test:test"
+  },
+  "main": "bld/library/index.js",
+  "types": "bld/library/index.d.ts",
+  "files": [
+    "bld/library",
+    "!*.js.map"
+  ],
+  "devDependencies": {
+    "@magicspace/configs": "^0.1.44",
+    "@types/jest": "^23.3.9",
+    "@types/node": "^10.12.10",
+    "jest": "^23.6.0",
+    "prettier": "^1.15.2",
+    "rimraf": "^2.6.2",
+    "ts-jest": "^23.10.5",
+    "tslint": "^5.11.0",
+    "tslint-language-service": "^0.9.9",
+    "typescript": "^3.1.6"
+  },
+  "dependencies": {}
+}
