@@ -37,7 +37,7 @@ export class Observable<T = any> {
       set: (object, key, value) => {
         object[key as number] = value;
 
-        if (key != 'length') {
+        if (key !== 'length') {
           this.trigger();
         }
 
@@ -51,11 +51,11 @@ function makePropertyObservable(target: any, key: string): void {
   let observable = new Observable(target[key]);
 
   Object.defineProperty(target, key, {
-    get: function() {
+    get() {
       return observable.get();
     },
-    set: function(value) {
-      return observable.set(value);
+    set(value) {
+      observable.set(value);
     },
   });
 

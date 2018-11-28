@@ -3,6 +3,6 @@ export function makeIterable<T>(iterator: Iterator<T>): IterableIterator<T> {
   return iterator as any;
 }
 
-function self(this: any) {
+function self<T>(this: T): T {
   return this;
 }

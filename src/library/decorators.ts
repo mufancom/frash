@@ -11,7 +11,7 @@ export function observable<T extends object, K extends keyof T>(
   Object.defineProperty(target, key, {
     enumerable: true,
     configurable: true,
-    get: function(this: T) {
+    get(this: T) {
       let observable = observableMap.get(this, key);
 
       if (!observable) {
@@ -20,7 +20,7 @@ export function observable<T extends object, K extends keyof T>(
 
       return observable.get();
     },
-    set: function(this: T, value: any) {
+    set(this: T, value: any) {
       let observable = observableMap.get(this, key);
 
       if (!observable) {
@@ -32,7 +32,7 @@ export function observable<T extends object, K extends keyof T>(
         makeObservable(value);
       }
 
-      return observable.set(value);
+      observable.set(value);
     },
   });
 }

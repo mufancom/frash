@@ -3,6 +3,26 @@ import {makeIterable} from './@utils';
 import {makeObservable} from './observable';
 
 export class ObservableMap<K, V> implements Map<K, V> {
+  [Symbol.toStringTag]: 'Map';
+
+  private id = idManager.generate('observable');
+
+  private _data: Map<K, V>;
+
+  constructor(data?: Map<K, V> | ReadonlyArray<[K, V]>) {
+    if (data instanceof Map) {
+      this._data = data;
+    } else {
+      this._data = new Map(data);
+    }
+  }
+
+  get size(): number {
+    this.reportObserved();
+
+    return this._data.size;
+  }
+
   [Symbol.iterator](): IterableIterator<[K, V]> {
     return this.entries();
   }
@@ -50,28 +70,6 @@ export class ObservableMap<K, V> implements Map<K, V> {
           : {done: true};
       },
     });
-  }
-
-  [Symbol.toStringTag]: 'Map';
-
-  private id = idManager.generate('observable');
-
-  private _data: Map<K, V>;
-
-  constructor(entries?: ReadonlyArray<[K, V]>);
-  constructor(map?: Map<K, V>);
-  constructor(data?: Map<K, V> | ReadonlyArray<[K, V]>) {
-    if (data instanceof Map) {
-      this._data = data;
-    } else {
-      this._data = new Map(data);
-    }
-  }
-
-  get size(): number {
-    this.reportObserved();
-
-    return this._data.size;
   }
 
   clear(): void {
