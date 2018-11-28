@@ -1,5 +1,5 @@
 class Cache {
-  private dataMap = new Map<string, any>();
+  private dataMap = new Map<string>();
 
   get(key: string): any | undefined {
     return this.dataMap.get(key);

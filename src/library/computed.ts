@@ -7,8 +7,6 @@ export function computed(
   let {get} = descriptor;
 
   function getter(this: any): any {
-    console.log(this);
-
     if (get) {
       return get.call(this);
     }
