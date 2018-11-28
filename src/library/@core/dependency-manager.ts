@@ -1,10 +1,12 @@
+import {ObservableId} from './id-manager';
+
 export interface ObservableInfo {
   target: any | undefined;
   observers: Function[];
 }
 
-export class DependencyManager {
-  private observableMap = new Map<string, ObservableInfo>();
+class DependencyManager {
+  private observableMap = new Map<ObservableId, ObservableInfo>();
 
   private observerStack: Function[] = [];
 
@@ -26,8 +28,8 @@ export class DependencyManager {
     return this.targetStack[this.observerStack.length - 1];
   }
 
-  trigger(observerId: string): void {
-    let info = this.observableMap.get(observerId);
+  trigger(observableId: ObservableId): void {
+    let info = this.observableMap.get(observableId);
 
     if (!info) {
       return;
@@ -45,33 +47,27 @@ export class DependencyManager {
     this.targetStack.push(target);
   }
 
-  collect(observerId: string): void {
-    if (this.nowObserver) {
-      this.addNowObserver(observerId);
+  collect(observableId: ObservableId): void {
+    if (!this.nowObserver) {
+      return;
+    }
+
+    let info = this.observableMap.get(observableId);
+
+    if (info) {
+      info.target = this.nowTarget;
+      info.observers.push(this.nowObserver);
+    } else {
+      this.observableMap.set(observableId, {
+        target: this.nowTarget,
+        observers: [this.nowObserver],
+      });
     }
   }
 
   endCollect(): void {
     this.observerStack.pop();
     this.targetStack.pop();
-  }
-
-  private addNowObserver(observerId: string): void {
-    if (!this.nowObserver) {
-      return;
-    }
-
-    let info = this.observableMap.get(observerId);
-
-    if (info) {
-      info.target = this.nowTarget;
-      info.observers.push(this.nowObserver);
-    } else {
-      this.observableMap.set(observerId, {
-        target: this.nowTarget,
-        observers: [this.nowObserver],
-      });
-    }
   }
 }
 
