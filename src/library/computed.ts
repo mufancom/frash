@@ -2,7 +2,7 @@ import {dependencyManager, idManager} from './@core';
 
 export type Getter<T> = () => T;
 
-export class Computed<T> {
+export class Computed<T = any> {
   private id = idManager.generate('computed');
 
   private hasBindAutoRecompute = false;

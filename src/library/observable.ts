@@ -1,17 +1,15 @@
 import {dependencyManager, idManager} from './@core';
 
-export class Observable<T> {
+export class Observable<T = any> {
   private id = idManager.generate('observable');
 
   private value: T;
 
   constructor(target: T) {
-    if (isPrimitive(target)) {
-      this.value = target;
-    } else if (isProxyFit(target)) {
-      this.value = this.wrapWithProxy(target);
+    if (Array.isArray(target)) {
+      this.value = this.wrapArrayWithProxy(target);
     } else {
-      throw new Error(`\`${typeof target}\` is not observable`);
+      this.value = target;
     }
   }
 
@@ -20,45 +18,77 @@ export class Observable<T> {
     return this.value;
   }
 
+  set(value: T): void {
+    if (Array.isArray(value)) {
+      this.wrapArrayWithProxy(value);
+    } else {
+      this.value = value;
+    }
+
+    dependencyManager.trigger(this.id);
+  }
+
   trigger(): void {
     dependencyManager.trigger(this.id);
   }
 
-  private wrapWithProxy(target: any, visited: any[] = []): any {
+  private wrapArrayWithProxy<A extends any[]>(target: A): A {
     return new Proxy(target, {
       set: (object, key, value) => {
-        object[key] = value;
-        this.trigger();
-        return true;
-      },
-      get: (object, key) => {
-        let value = object[key];
+        object[key as number] = value;
 
-        // Visited set is for avoiding circle reference
-        if (isProxyFit(value) && !visited.includes(value)) {
-          return this.wrapWithProxy(value);
+        if (key != 'length') {
+          this.trigger();
         }
 
-        return value;
+        return true;
       },
     });
   }
 }
 
-export type PrimitiveType = string | number | boolean | null | undefined;
+function makePropertyObservable(target: any, key: string): void {
+  let observable = new Observable(target[key]);
 
-export function isPrimitive(value: any): value is PrimitiveType {
-  return (
-    typeof value === 'boolean' ||
-    typeof value === 'number' ||
-    typeof value === 'string' ||
-    typeof value === 'undefined' ||
-    value === null
-  );
+  Object.defineProperty(target, key, {
+    get: function() {
+      return observable.get();
+    },
+    set: function(value) {
+      return observable.set(value);
+    },
+  });
+
+  let value = target[key];
+
+  if (typeof value === 'object') {
+    for (let childKey of Object.keys(value)) {
+      if (!value.hasOwnProperty(childKey)) {
+        continue;
+      }
+
+      makePropertyObservable(value, childKey);
+    }
+  }
 }
 
-export type ProxyFitType = object | any[];
+export function extendObservable(target: any, extend: any): void {
+  for (let key of Object.keys(extend)) {
+    if (!extend.hasOwnProperty(key)) {
+      continue;
+    }
 
-export function isProxyFit(value: any): value is ProxyFitType {
-  return typeof value === 'object' || Array.isArray(value);
+    target[key] = extend[key];
+    makePropertyObservable(target, key);
+  }
+}
+
+export function makeObservable(target: any): void {
+  for (let key of Object.keys(target)) {
+    if (!target.hasOwnProperty(key)) {
+      continue;
+    }
+
+    makePropertyObservable(target, key);
+  }
 }
