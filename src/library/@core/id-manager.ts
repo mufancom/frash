@@ -1,9 +1,6 @@
-export type ObservableId = number;
-export type ComputedId = number;
-
 interface MaxIdStore {
-  observable: ObservableId;
-  computed: ComputedId;
+  observable: number;
+  computed: number;
 }
 
 export class IdManager {
@@ -12,8 +9,8 @@ export class IdManager {
     computed: 0,
   };
 
-  generate<T extends keyof MaxIdStore>(type: T): MaxIdStore[T] {
-    return ++this.maxIdStore[type];
+  generate<T extends keyof MaxIdStore>(type: T): string {
+    return `${type}-${++this.maxIdStore[type]}`;
   }
 }
 

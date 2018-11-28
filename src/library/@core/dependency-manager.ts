@@ -1,12 +1,10 @@
-import {ObservableId} from './id-manager';
-
 export interface ObservableInfo {
   target: any | undefined;
   observers: Function[];
 }
 
 class DependencyManager {
-  private observableMap = new Map<ObservableId, ObservableInfo>();
+  private observableMap = new Map<string, ObservableInfo>();
 
   private observerStack: Function[] = [];
 
@@ -28,7 +26,7 @@ class DependencyManager {
     return this.targetStack[this.observerStack.length - 1];
   }
 
-  trigger(observableId: ObservableId): void {
+  trigger(observableId: string): void {
     let info = this.observableMap.get(observableId);
 
     if (!info) {
@@ -47,7 +45,7 @@ class DependencyManager {
     this.targetStack.push(target);
   }
 
-  collect(observableId: ObservableId): void {
+  collect(observableId: string): void {
     if (!this.currentObserver) {
       return;
     }

@@ -25,7 +25,7 @@ export class Observable<T = any> {
       this.value = value;
     }
 
-    dependencyManager.trigger(this.id);
+    this.trigger();
   }
 
   trigger(): void {

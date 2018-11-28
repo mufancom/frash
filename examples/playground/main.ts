@@ -5,30 +5,24 @@ import {computed, observable} from '../../bld/library';
  */
 
 class Hello {
-  @test
-  test: string = 'fawf';
+  @observable
+  test = new Map();
+  name: string = '1';
 
-  name: string = 'awd';
-
+  @computed
   get name2(): string {
-    return 'sd' + this.test;
+    return this.name + JSON.stringify(this.test.keys());
   }
 }
 
 let hello = new Hello();
-hello.name = 'hadhawd';
 
-console.log(hello.test);
+console.log(hello.name2);
 
-function test(target: any, key: string): any {
-  Reflect.defineProperty(target, key, {
-    get: function() {
-      console.log(this);
+hello.name = '2';
 
-      return 'dadw';
-    },
-    set: function(value) {
-      return true;
-    },
-  });
-}
+console.log(hello.name2);
+
+hello.test.set('3', true);
+
+console.log(hello.name2);
