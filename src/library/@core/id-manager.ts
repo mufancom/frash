@@ -10,7 +10,7 @@ export class IdManager {
   };
 
   generate<T extends keyof MaxIdStore>(type: T): MaxIdStore[T] {
-    return this.maxIdStore[type];
+    return this.maxIdStore[type]++;
   }
 }
 

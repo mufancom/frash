@@ -12,7 +12,7 @@ class DependencyManager {
 
   private targetStack: any[] = [];
 
-  private get nowObserver(): Function | undefined {
+  private get currentObserver(): Function | undefined {
     if (!this.observerStack.length) {
       return undefined;
     }
@@ -20,7 +20,7 @@ class DependencyManager {
     return this.observerStack[this.observerStack.length - 1];
   }
 
-  private get nowTarget(): any | undefined {
+  private get currentTarget(): any | undefined {
     if (!this.targetStack.length) {
       return undefined;
     }
@@ -48,19 +48,19 @@ class DependencyManager {
   }
 
   collect(observableId: ObservableId): void {
-    if (!this.nowObserver) {
+    if (!this.currentObserver) {
       return;
     }
 
     let info = this.observableMap.get(observableId);
 
     if (info) {
-      info.target = this.nowTarget;
-      info.observers.push(this.nowObserver);
+      info.target = this.currentTarget;
+      info.observers.push(this.currentObserver);
     } else {
       this.observableMap.set(observableId, {
-        target: this.nowTarget,
-        observers: [this.nowObserver],
+        target: this.currentTarget,
+        observers: [this.currentObserver],
       });
     }
   }
