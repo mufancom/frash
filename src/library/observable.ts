@@ -1,19 +1,21 @@
 import {dependencyManager, idManager} from './@core';
 
-export class Observable {
+export class Observable<T> {
   private id = idManager.generate('observable');
 
-  private value: any;
+  private value: T;
 
-  constructor(target: any) {
+  constructor(target: T) {
     if (isPrimitive(target)) {
       this.value = target;
     } else if (isProxyFit(target)) {
       this.value = this.wrapWithProxy(target);
+    } else {
+      throw new Error(`\`${typeof target}\` is not observable`);
     }
   }
 
-  get(): any {
+  get(): T {
     dependencyManager.collect(this.id);
     return this.value;
   }
@@ -32,7 +34,7 @@ export class Observable {
       get: (object, key) => {
         let value = object[key];
 
-        // Visited set is to avoid circle reference
+        // Visited set is for avoiding circle reference
         if (isProxyFit(value) && !visited.includes(value)) {
           return this.wrapWithProxy(value);
         }
