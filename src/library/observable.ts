@@ -22,7 +22,7 @@ export class Observable {
     dependencyManager.trigger(this.id);
   }
 
-  private wrapWithProxy(target: any): any {
+  private wrapWithProxy(target: any, visited: any[] = []): any {
     return new Proxy(target, {
       set: (object, key, value) => {
         object[key] = value;
@@ -30,11 +30,14 @@ export class Observable {
         return true;
       },
       get: (object, key) => {
-        if (isProxyFit(object[key])) {
-          return this.wrapWithProxy(object[key]);
+        let value = object[key];
+
+        // Visited set is to avoid circle reference
+        if (isProxyFit(value) && !visited.includes(value)) {
+          return this.wrapWithProxy(value);
         }
 
-        return object[key];
+        return value;
       },
     });
   }
