@@ -13,7 +13,7 @@ export class Observable {
     }
   }
 
-  get() {
+  get(): any {
     dependencyManager.collect(this.id);
     return this.value;
   }
@@ -52,7 +52,7 @@ export function isPrimitive(value: any): value is PrimitiveType {
   );
 }
 
-export type ProxyFitType = object | Array<any>;
+export type ProxyFitType = object | any[];
 
 export function isProxyFit(value: any): value is ProxyFitType {
   return typeof value === 'object' || Array.isArray(value);
