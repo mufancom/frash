@@ -1,4 +1,5 @@
-import {dependencyManager, idManager} from './@core';
+import {dependencyManager} from './dependency-manager';
+import {idManager} from './id-manager';
 
 export type Getter<T> = () => T;
 

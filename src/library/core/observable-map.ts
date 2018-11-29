@@ -1,5 +1,7 @@
-import {dependencyManager, idManager} from './@core';
-import {makeIterable} from './@utils';
+import {makeIterable} from '../utils';
+
+import {dependencyManager} from './dependency-manager';
+import {idManager} from './id-manager';
 import {makeObservable} from './observable';
 
 export class ObservableMap<K, V> implements Map<K, V> {
