@@ -1,4 +1,5 @@
 import {dependencyManager, idManager} from './@core';
+import {ObservableMap} from './observable-map';
 
 export class Observable<T = any> {
   private id = idManager.generate('observable');
@@ -8,6 +9,8 @@ export class Observable<T = any> {
   constructor(target: T) {
     if (Array.isArray(target)) {
       this.value = this.wrapArrayWithProxy(target);
+    } else if (target instanceof Map) {
+      this.value = new ObservableMap(target) as any;
     } else {
       this.value = target;
     }
@@ -21,6 +24,8 @@ export class Observable<T = any> {
   set(value: T): void {
     if (Array.isArray(value)) {
       this.wrapArrayWithProxy(value);
+    } else if (value instanceof Map) {
+      this.value = new ObservableMap(value) as any;
     } else {
       this.value = value;
     }
