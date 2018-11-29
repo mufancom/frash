@@ -1,7 +1,7 @@
 import {Computed} from '../core';
 import {DoubleKeyMap} from '../utils';
 
-export function computed<T extends object>(
+function computedDecorator<T extends object>(
   _target: T,
   name: string,
   descriptor: PropertyDescriptor,
@@ -26,4 +26,27 @@ export function computed<T extends object>(
   }
 
   descriptor.get = getter;
+}
+
+export function computed<T>(target: () => T): Computed<T>;
+export function computed<T extends object>(
+  target: T,
+  name: string,
+  descriptor: PropertyDescriptor,
+): void;
+export function computed(
+  this: any,
+  target: any,
+  name?: string,
+  descriptor?: PropertyDescriptor,
+): any {
+  if (!name && !descriptor) {
+    return new Computed(this, target);
+  } else if (name && descriptor) {
+    computedDecorator(target, name, descriptor);
+  } else {
+    throw new Error(
+      `Unexpected usage. \`computed\` should either be used as a getter decorator or a function wrapper.`,
+    );
+  }
 }
