@@ -26,3 +26,21 @@ console.log(hello.name2);
 hello.test.set('3', true);
 
 console.log(hello.name2);
+
+let obj = observable({a: 1});
+
+let value = '1-';
+
+let com = computed(() => {
+  return value + obj.a;
+});
+
+console.log(com.get());
+
+value = '2-';
+
+console.log(com.get());
+
+obj.a = 2;
+
+console.log(com.get());
