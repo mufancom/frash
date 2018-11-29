@@ -11,7 +11,7 @@ class Hello {
 
   @computed
   get name2(): string {
-    return this.name + JSON.stringify(this.test.keys());
+    return this.name + JSON.stringify(this.test.get('3'));
   }
 }
 

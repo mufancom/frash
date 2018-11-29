@@ -11,8 +11,22 @@ export class ObservableMap<K, V> implements Map<K, V> {
 
   constructor(data?: Map<K, V> | ReadonlyArray<[K, V]>) {
     if (data instanceof Map) {
+      for (let item of data.values()) {
+        if (typeof item === 'object') {
+          makeObservable(item);
+        }
+      }
+
       this._data = data;
     } else {
+      if (data) {
+        for (let item of data) {
+          if (typeof item === 'object') {
+            makeObservable(item);
+          }
+        }
+      }
+
       this._data = new Map(data);
     }
   }

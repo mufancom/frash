@@ -1,5 +1,6 @@
-export function makeIterable<T>(iterator: Iterator<T>): IterableIterator<T> {
-  (iterator as any)[Symbol.iterator] = self;
+export function makeIterable<T>(_iterator: Iterator<T>): IterableIterator<T> {
+  let iterator = _iterator as any;
+  iterator[Symbol.iterator] = self;
   return iterator as any;
 }
 
