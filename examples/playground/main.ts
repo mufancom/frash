@@ -44,3 +44,25 @@ console.log(com.get());
 obj.a = 2;
 
 console.log(com.get());
+
+let x = observable.box(3);
+
+let z = 5;
+
+let y = computed(() => {
+  return x.get() + z;
+});
+
+let y2 = computed(() => {
+  return x.get() + z + 1;
+});
+
+console.log(y.get(), 8, y2.get(), 9);
+
+z = 6;
+
+console.log(y.get(), 8, y2.get(), 9);
+
+x.set(4);
+
+console.log(y.get(), 10, y2.get(), 11);

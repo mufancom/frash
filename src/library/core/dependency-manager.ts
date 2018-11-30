@@ -1,10 +1,7 @@
-export interface ObservableInfo {
-  target: any | undefined;
-  observers: Function[];
-}
+import {DoubleKeyMap} from '../utils';
 
 class DependencyManager {
-  private observableMap = new Map<string, ObservableInfo>();
+  private observableMap = new DoubleKeyMap<string, object, Function[]>();
 
   private observerStack: Function[] = [];
 
@@ -27,20 +24,20 @@ class DependencyManager {
   }
 
   trigger(observableId: string): void {
-    let info = this.observableMap.get(observableId);
+    let info = this.observableMap.getSubMap(observableId);
 
     if (!info) {
       return;
     }
 
-    let {target, observers} = info;
-
-    for (let observer of observers) {
-      observer.call(target || this);
+    for (let [target, observers] of info) {
+      for (let observer of observers) {
+        observer.call(target || this);
+      }
     }
   }
 
-  beginCollect(observer: Function, target: any): void {
+  beginCollect(observer: Function, target?: any): void {
     this.observerStack.push(observer);
     this.targetStack.push(target);
   }
@@ -50,16 +47,14 @@ class DependencyManager {
       return;
     }
 
-    let info = this.observableMap.get(observableId);
+    let observers = this.observableMap.get(observableId, this.currentTarget);
 
-    if (info) {
-      info.target = this.currentTarget;
-      info.observers.push(this.currentObserver);
+    if (observers) {
+      observers.push(this.currentObserver);
     } else {
-      this.observableMap.set(observableId, {
-        target: this.currentTarget,
-        observers: [this.currentObserver],
-      });
+      this.observableMap.set(observableId, this.currentTarget, [
+        this.currentObserver,
+      ]);
     }
   }
 

@@ -376,6 +376,7 @@ export class ObservableArray<T = any, U = any> implements Array<T> {
   }
 }
 
+// TODO: to extend array object's own non-array-item property
 export function createObservableArray<T, U>(
   arrayLike: ArrayLike<T>,
   mapfn: (v: U, k: number) => T,

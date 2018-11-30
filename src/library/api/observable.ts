@@ -1,6 +1,13 @@
 import {convertToObservable} from '../core';
-import {ObservableMap, ObservableValue, createObservableObject} from '../types';
-import {DoubleKeyMap, PrimitiveType} from '../utils';
+import {
+  ObservableArray,
+  ObservableMap,
+  ObservableValue,
+  createObservableArray,
+  createObservableMap,
+  createObservableObject,
+} from '../types';
+import {DoubleKeyMap} from '../utils';
 
 function observableDecorator<T extends object, K extends keyof T>(
   target: T,
@@ -49,16 +56,30 @@ export function observable<T extends object, K extends keyof T>(
   observableDecorator(target, key);
 }
 
-observable.box = <T extends PrimitiveType>(value: T): ObservableValue<T> => {
-  return new ObservableValue(value);
-};
+export namespace observable {
+  export function box(): ObservableValue;
+  export function box<T = any>(value: T): ObservableValue<T>;
+  export function box<T>(value?: T): any {
+    return new ObservableValue(value);
+  }
 
-observable.map = <K, V>(
-  value: Map<K, V> | ReadonlyArray<[K, V]>,
-): ObservableMap<K, V> => {
-  return new ObservableMap(value);
-};
+  export function array(): ObservableArray;
+  export function array<T = any>(value: ArrayLike<T>): ObservableArray<T>;
+  export function array<T = any>(
+    value?: ArrayLike<T> | undefined,
+  ): ObservableArray {
+    return createObservableArray(value);
+  }
 
-observable.object = <T extends object>(value: T): T => {
-  return createObservableObject(value);
-};
+  export function map<K = any, V = any>(
+    value?: Map<K, V> | ReadonlyArray<[K, V]>,
+  ): ObservableMap<K, V> {
+    return createObservableMap(value);
+  }
+
+  export function object(): any;
+  export function object<T = any>(value: T): T;
+  export function object(value: any = {}): any {
+    return createObservableObject(value);
+  }
+}

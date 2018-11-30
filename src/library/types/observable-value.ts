@@ -1,7 +1,7 @@
 import {dependencyManager, idManager} from '../core';
 
 export class ObservableValue<T = any> {
-  readonly id = idManager.generate('observable');
+  readonly observableId = idManager.generate('observable');
 
   private value: T;
 
@@ -10,7 +10,7 @@ export class ObservableValue<T = any> {
   }
 
   get(): T {
-    dependencyManager.collect(this.id);
+    dependencyManager.collect(this.observableId);
     return this.value;
   }
 
@@ -21,6 +21,6 @@ export class ObservableValue<T = any> {
   }
 
   trigger(): void {
-    dependencyManager.trigger(this.id);
+    dependencyManager.trigger(this.observableId);
   }
 }

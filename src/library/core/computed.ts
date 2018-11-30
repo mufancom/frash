@@ -4,7 +4,7 @@ import {idManager} from './id-manager';
 export type Getter<T> = () => T;
 
 export class Computed<T = any> {
-  private id = idManager.generate('computed');
+  private computedId = idManager.generate('computed');
 
   private hasBindAutoRecompute = false;
 
@@ -19,7 +19,7 @@ export class Computed<T = any> {
   get(): T {
     this.bindAutoRecompute();
 
-    dependencyManager.collect(this.id);
+    dependencyManager.collect(this.computedId);
 
     return this.value;
   }
@@ -27,7 +27,7 @@ export class Computed<T = any> {
   private recompute(): void {
     this.value = this.getter.call(this.target);
 
-    dependencyManager.trigger(this.id);
+    dependencyManager.trigger(this.computedId);
   }
 
   private bindAutoRecompute(): void {

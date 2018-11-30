@@ -1,7 +1,7 @@
 import {convertToObservable, dependencyManager, idManager} from '../core';
 import {makeIterable} from '../utils';
 
-import {wrapObservableMethod} from './observable-object';
+import {extendObservable, wrapObservableMethod} from './observable-object';
 
 export class ObservableMap<K = any, V = any> implements Map<K, V> {
   [Symbol.toStringTag]: 'Map';
@@ -139,6 +139,8 @@ export function createObservableMap<K, V>(
   data?: Map<K, V> | ReadonlyArray<[K, V]>,
 ): ObservableMap<K, V> {
   let map = new ObservableMap(data);
+
+  extendObservable(map, data);
 
   let handler: ProxyHandler<typeof map> = {
     set(target: any, key, value) {
