@@ -7,15 +7,13 @@ export class ObservableArray<T = any, U = any> implements Array<T> {
 
   readonly observableId = idManager.generate('observable');
 
-  private _data: Array<T>;
+  private _data: T[];
 
-  constructor(array: Array<T>);
   constructor(
     arrayLike: ArrayLike<T>,
-    mapfn: (v: U, k: number) => T,
+    mapfn?: (v: U, k: number) => T,
     thisArg?: any,
   );
-  constructor(arrayLike: ArrayLike<T>);
   constructor(...items: T[]);
   constructor(...args: any[]) {
     if (args.length === 1 && args[0] instanceof Array) {
@@ -210,15 +208,7 @@ export class ObservableArray<T = any, U = any> implements Array<T> {
       currentIndex: number,
       array: T[],
     ) => T,
-  ): T;
-  reduce(
-    callbackfn: (
-      previousValue: T,
-      currentValue: T,
-      currentIndex: number,
-      array: T[],
-    ) => T,
-    initialValue: T,
+    initialValue?: T,
   ): T;
   reduce<U>(
     callbackfn: (
@@ -242,15 +232,7 @@ export class ObservableArray<T = any, U = any> implements Array<T> {
       currentIndex: number,
       array: T[],
     ) => T,
-  ): T;
-  reduceRight(
-    callbackfn: (
-      previousValue: T,
-      currentValue: T,
-      currentIndex: number,
-      array: T[],
-    ) => T,
-    initialValue: T,
+    initialValue?: T,
   ): T;
   reduceRight<U>(
     callbackfn: (
