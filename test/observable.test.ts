@@ -1,4 +1,5 @@
 import {
+  autorun,
   computed,
   extendObservable,
   isObservable,
@@ -152,4 +153,18 @@ test('props1', () => {
   order.amount = 3;
 
   expect(order.total).toBe(36);
+
+  let totals: number[] = [];
+
+  let dispose = autorun(() => {
+    totals.push(order.total);
+  });
+
+  order.amount = 4;
+
+  dispose();
+
+  order.amount = 5;
+
+  expect(totals).toEqual([36, 48]);
 });
