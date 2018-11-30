@@ -1,11 +1,12 @@
-import {Observable, ObservableMap, makeObservable} from '../core';
+import {convertToObservable} from '../core';
+import {ObservableMap, ObservableValue, createObservableObject} from '../types';
 import {DoubleKeyMap, PrimitiveType} from '../utils';
 
 function observableDecorator<T extends object, K extends keyof T>(
   target: T,
   key: K,
 ): void {
-  let observableMap = new DoubleKeyMap<T, K, Observable>();
+  let observableMap = new DoubleKeyMap<T, K, ObservableValue>();
 
   Object.defineProperty(target, key, {
     enumerable: true,
@@ -23,15 +24,11 @@ function observableDecorator<T extends object, K extends keyof T>(
       let observable = observableMap.get(this, key);
 
       if (!observable) {
-        observable = new Observable(value);
+        observable = new ObservableValue(value);
         observableMap.set(this, key, observable);
       }
 
-      if (typeof value === 'object') {
-        makeObservable(value);
-      }
-
-      observable.set(value);
+      observable.set(convertToObservable(value));
     },
   });
 }
@@ -46,16 +43,14 @@ export function observable<T extends object, K extends keyof T>(
   key?: keyof T,
 ): T | void {
   if (!key) {
-    makeObservable(target);
-
-    return target;
+    return convertToObservable(target);
   }
 
   observableDecorator(target, key);
 }
 
-observable.box = <T extends PrimitiveType>(value: T): Observable<T> => {
-  return new Observable(value);
+observable.box = <T extends PrimitiveType>(value: T): ObservableValue<T> => {
+  return new ObservableValue(value);
 };
 
 observable.map = <K, V>(
@@ -65,7 +60,5 @@ observable.map = <K, V>(
 };
 
 observable.object = <T extends object>(value: T): T => {
-  makeObservable(value);
-
-  return value;
+  return createObservableObject(value);
 };

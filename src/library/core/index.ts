@@ -1,3 +1,4 @@
 export * from './computed';
 export * from './observable';
-export * from './observable-map';
+export * from './dependency-manager';
+export * from './id-manager';

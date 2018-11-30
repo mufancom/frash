@@ -1,13 +1,12 @@
+import {convertToObservable, dependencyManager, idManager} from '../core';
 import {makeIterable} from '../utils';
 
-import {dependencyManager} from './@dependency-manager';
-import {idManager} from './@id-manager';
-import {convertToObservable, makeObservable} from './observable';
+import {wrapObservableMethod} from './observable-object';
 
-export class ObservableMap<K, V> implements Map<K, V> {
+export class ObservableMap<K = any, V = any> implements Map<K, V> {
   [Symbol.toStringTag]: 'Map';
 
-  private id = idManager.generate('observable');
+  readonly observableId = idManager.generate('observable');
 
   private _data: Map<K, V>;
 
@@ -128,10 +127,32 @@ export class ObservableMap<K, V> implements Map<K, V> {
   }
 
   private reportObserved(): void {
-    dependencyManager.collect(this.id);
+    dependencyManager.collect(this.observableId);
   }
 
   private trigger(): void {
-    dependencyManager.trigger(this.id);
+    dependencyManager.trigger(this.observableId);
   }
+}
+
+export function createObservableMap<K, V>(
+  data?: Map<K, V> | ReadonlyArray<[K, V]>,
+): ObservableMap<K, V> {
+  let map = new ObservableMap(data);
+
+  let handler: ProxyHandler<typeof map> = {
+    set(target: any, key, value) {
+      if (typeof value === 'function') {
+        target[key] = wrapObservableMethod(value, map.observableId);
+      } else {
+        target[key] = convertToObservable(value);
+      }
+
+      dependencyManager.trigger(map.observableId);
+
+      return true;
+    },
+  };
+
+  return new Proxy(map, handler);
 }
