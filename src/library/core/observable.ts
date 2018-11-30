@@ -1,5 +1,6 @@
 import {dependencyManager} from './@dependency-manager';
 import {idManager} from './@id-manager';
+import {ObservableArray} from './observable-array';
 import {ObservableMap} from './observable-map';
 
 export class Observable<T = any> {
@@ -8,13 +9,7 @@ export class Observable<T = any> {
   private value: T;
 
   constructor(target: T) {
-    if (Array.isArray(target)) {
-      this.value = this.wrapArrayWithProxy(target);
-    } else if (target instanceof Map) {
-      this.value = new ObservableMap(target) as any;
-    } else {
-      this.value = target;
-    }
+    this.value = target;
   }
 
   get(): T {
@@ -97,4 +92,17 @@ export function makeObservable(target: any): void {
 
     makePropertyObservable(target, key);
   }
+}
+
+export function convertToObservable<T>(target: T): T {
+  if (Array.isArray(target)) {
+    return new ObservableArray(target) as any;
+  } else if (target instanceof Map) {
+    return new ObservableMap(target) as any;
+  } else if (typeof target === 'object') {
+    makeObservable(target);
+    return target;
+  }
+
+  return target;
 }
