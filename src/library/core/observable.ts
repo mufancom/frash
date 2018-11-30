@@ -1,6 +1,8 @@
-import {createObservableArray} from '../types/observable-array';
-import {createObservableMap} from '../types/observable-map';
-import {createObservableObject} from '../types/observable-object';
+import {
+  createObservableArray,
+  createObservableMap,
+  createObservableObject,
+} from '../types';
 
 export function convertToObservable<T>(target: T): T {
   if (isObservable(target)) {
@@ -19,5 +21,5 @@ export function convertToObservable<T>(target: T): T {
 }
 
 export function isObservable(target: any): boolean {
-  return 'observableId' in target;
+  return typeof target === 'object' && 'observableId' in target;
 }
