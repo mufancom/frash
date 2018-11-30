@@ -1,5 +1,5 @@
-import {dependencyManager} from './dependency-manager';
-import {idManager} from './id-manager';
+import {dependencyManager} from './@dependency-manager';
+import {idManager} from './@id-manager';
 import {ObservableMap} from './observable-map';
 
 export class Observable<T = any> {

@@ -1,5 +1,5 @@
 import {Observable, ObservableMap, makeObservable} from '../core';
-import {DoubleKeyMap} from '../utils';
+import {DoubleKeyMap, PrimitiveType} from '../utils';
 
 function observableDecorator<T extends object, K extends keyof T>(
   target: T,
@@ -54,7 +54,7 @@ export function observable<T extends object, K extends keyof T>(
   observableDecorator(target, key);
 }
 
-observable.box = <T>(value: T): Observable<T> => {
+observable.box = <T extends PrimitiveType>(value: T): Observable<T> => {
   return new Observable(value);
 };
 
@@ -62,4 +62,10 @@ observable.map = <K, V>(
   value: Map<K, V> | ReadonlyArray<[K, V]>,
 ): ObservableMap<K, V> => {
   return new ObservableMap(value);
+};
+
+observable.object = <T extends object>(value: T): T => {
+  makeObservable(value);
+
+  return value;
 };

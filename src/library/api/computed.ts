@@ -28,7 +28,7 @@ function computedDecorator<T extends object>(
   descriptor.get = getter;
 }
 
-export function computed<T>(target: () => T): Computed<T>;
+export function computed<T>(fn: () => T): Computed<T>;
 export function computed<T extends object>(
   target: T,
   name: string,
