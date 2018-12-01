@@ -39,7 +39,7 @@ class DependencyManager {
     }
   }
 
-  beginCollect(observer: Function, target?: any): void {
+  beginCollect(observer: Function, target: any): void {
     this.observerStack.push(observer);
     this.targetStack.push(target);
 
