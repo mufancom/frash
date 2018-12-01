@@ -357,3 +357,104 @@ test('observables removed', () => {
   expect(c.get()).toBe(9);
   expect(calcs).toBe(3);
 });
+
+// TODO: lazy evaluation
+test('instant evaluation', () => {
+  let bCalcs = 0;
+  let cCalcs = 0;
+
+  let a = observable.box(1);
+
+  let b = computed(() => {
+    bCalcs += 1;
+
+    return a.get() + 1;
+  });
+
+  let c = computed(() => {
+    cCalcs += 1;
+
+    return b.get() + 1;
+  });
+
+  expect(bCalcs).toBe(0);
+  expect(cCalcs).toBe(0);
+  expect(c.get()).toBe(3);
+  expect(bCalcs).toBe(1);
+  expect(cCalcs).toBe(1);
+
+  expect(c.get()).toBe(3);
+  expect(bCalcs).toBe(1);
+  expect(cCalcs).toBe(1);
+
+  a.set(2);
+
+  expect(bCalcs).toBe(2);
+  expect(cCalcs).toBe(2);
+
+  expect(c.get()).toBe(4);
+  expect(bCalcs).toBe(2);
+  expect(cCalcs).toBe(2);
+});
+
+test('multiple view dependencies', () => {
+  let bCalcs = 0;
+  let dCalcs = 0;
+
+  let a = observable.box(1);
+
+  let b = computed(() => {
+    bCalcs++;
+
+    return 2 * a.get();
+  });
+
+  let c = observable.box(2);
+
+  let d = computed(() => {
+    dCalcs++;
+
+    return 3 * c.get();
+  });
+
+  let zwitch = true;
+
+  let buffer: number[] = [];
+
+  let fCalcs = 0;
+
+  let dis = autorun(() => {
+    fCalcs++;
+
+    if (zwitch) {
+      buffer.push(b.get() + d.get());
+    } else {
+      buffer.push(d.get() + b.get());
+    }
+  });
+
+  zwitch = false;
+
+  c.set(3);
+
+  expect(bCalcs).toBe(1);
+  expect(dCalcs).toBe(2);
+  expect(fCalcs).toBe(2);
+  expect(buffer).toEqual([8, 11]);
+
+  c.set(4);
+
+  expect(bCalcs).toBe(1);
+  expect(dCalcs).toBe(3);
+  expect(fCalcs).toBe(3);
+  expect(buffer).toEqual([8, 11, 14]);
+
+  dis();
+
+  c.set(5);
+
+  expect(bCalcs).toBe(1);
+  expect(dCalcs).toBe(4); // Instant evaluation
+  expect(fCalcs).toBe(3);
+  expect(buffer).toEqual([8, 11, 14]);
+});
