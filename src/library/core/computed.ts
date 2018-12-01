@@ -1,3 +1,5 @@
+import {isPrimitiveType} from '../utils';
+
 import {dependencyManager} from './dependency-manager';
 import {idManager} from './id-manager';
 
@@ -12,10 +14,6 @@ export class Computed<T = any> {
 
   constructor(private target: object, private getter: Getter<T>) {}
 
-  fillInTarget(target: object): void {
-    this.target = target;
-  }
-
   get(): T {
     this.bindAutoRecompute();
 
@@ -25,9 +23,15 @@ export class Computed<T = any> {
   }
 
   private recompute(): void {
-    this.value = this.getter.call(this.target);
+    let oldValue = this.value;
 
-    dependencyManager.trigger(this.computedId);
+    dependencyManager.beginCollect(this.recompute, this);
+    this.value = this.getter.call(this.target);
+    dependencyManager.endCollect();
+
+    if (oldValue !== this.value || !isPrimitiveType(this.value)) {
+      dependencyManager.trigger(this.computedId);
+    }
   }
 
   private bindAutoRecompute(): void {
@@ -37,8 +41,6 @@ export class Computed<T = any> {
 
     this.hasBindAutoRecompute = true;
 
-    dependencyManager.beginCollect(this.recompute, this);
     this.recompute();
-    dependencyManager.endCollect();
   }
 }

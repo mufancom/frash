@@ -31,8 +31,10 @@ class DependencyManager {
     }
 
     for (let [target, observers] of info) {
-      for (let observer of observers) {
-        observer.call(target || this);
+      if (Array.isArray(observers)) {
+        for (let observer of observers) {
+          observer.call(target || this);
+        }
       }
     }
   }
@@ -40,6 +42,10 @@ class DependencyManager {
   beginCollect(observer: Function, target?: any): void {
     this.observerStack.push(observer);
     this.targetStack.push(target);
+
+    if (typeof target !== 'undefined') {
+      this.observableMap.deleteBySubKey(target);
+    }
   }
 
   collect(observableId: string): void {
@@ -50,7 +56,9 @@ class DependencyManager {
     let observers = this.observableMap.get(observableId, this.currentTarget);
 
     if (observers) {
-      observers.push(this.currentObserver);
+      if (!observers.includes(this.currentObserver)) {
+        observers.push(this.currentObserver);
+      }
     } else {
       this.observableMap.set(observableId, this.currentTarget, [
         this.currentObserver,

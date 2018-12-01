@@ -16,7 +16,11 @@ import {ObservableValue} from './observable-value';
 export function createObservableObject<T extends object>(target: T): T {
   let observableId = idManager.generate('observable');
 
-  (target as any).observableId = observableId;
+  Object.defineProperty(target, 'observableId', {
+    enumerable: false,
+    writable: false,
+    value: observableId,
+  });
 
   makePropertiesObservable(target);
 
@@ -59,31 +63,32 @@ function makePrimitivePropertyObservable(target: any, key: string): void {
   });
 }
 
-export function extendObservable(target: any, extend: any): void {
+export function extendObservable(target: any, toExtend: any): void {
   let isTargetObservable = isObservable(target);
 
-  for (let key of Object.keys(extend)) {
-    if (!extend.hasOwnProperty(key)) {
+  for (let key of Object.keys(toExtend)) {
+    if (!toExtend.hasOwnProperty(key)) {
       continue;
     }
 
-    if (propertyHasGetterOrSetter(extend, key)) {
-      let get = getGetter(extend, key);
-      let set = getSetter(extend, key);
+    if (propertyHasGetterOrSetter(toExtend, key)) {
+      let get = getGetter(toExtend, key);
+      let set = getSetter(toExtend, key);
 
       Object.defineProperty(target, key, {
+        enumerable: false,
         get,
         set,
       });
     } else {
-      target[key] = extend[key];
+      target[key] = toExtend[key];
 
       makePropertyObservable(target, key);
     }
 
     if (
       !isTargetObservable &&
-      isPrimitiveType(target[key]) &&
+      (isPrimitiveType(target[key]) || target[key] === null) &&
       !propertyHasGetterOrSetter(target, key)
     ) {
       makePrimitivePropertyObservable(target, key);
@@ -99,6 +104,10 @@ export function makePropertiesObservable<T extends object>(target: T): void {
 
     if (!propertyHasGetterOrSetter(target, key)) {
       makePropertyObservable(target, key);
+    } else {
+      Object.defineProperty(target, key, {
+        enumerable: false,
+      });
     }
   }
 }

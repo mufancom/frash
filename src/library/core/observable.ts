@@ -13,7 +13,7 @@ export function convertToObservable<T>(target: T): T {
     return createObservableArray(target) as any;
   } else if (target instanceof Map) {
     return createObservableMap(target) as any;
-  } else if (typeof target === 'object') {
+  } else if (typeof target === 'object' && target !== null) {
     return createObservableObject(target as any);
   }
 
@@ -21,5 +21,5 @@ export function convertToObservable<T>(target: T): T {
 }
 
 export function isObservable(target: any): boolean {
-  return typeof target === 'object' && 'observableId' in target;
+  return typeof target === 'object' && target !== null && !!target.observableId;
 }

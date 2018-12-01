@@ -6,6 +6,10 @@ export class ObservableValue<T = any> {
   private value: T;
 
   constructor(target: T) {
+    Object.defineProperty(this, 'observableId', {
+      enumerable: false,
+    });
+
     this.value = target;
   }
 

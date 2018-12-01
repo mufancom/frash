@@ -16,6 +16,10 @@ export class ObservableArray<T = any, U = any> implements Array<T> {
   );
   constructor(...items: T[]);
   constructor(...args: any[]) {
+    Object.defineProperty(this, 'observableId', {
+      enumerable: false,
+    });
+
     if (args.length === 1 && args[0] instanceof Array) {
       this._data = args[0];
     } else {
@@ -320,6 +324,7 @@ export class ObservableArray<T = any, U = any> implements Array<T> {
     findIndex: boolean;
     keys: boolean;
     values: boolean;
+    observableId: boolean;
   } {
     return {
       copyWithin: false,
@@ -329,6 +334,7 @@ export class ObservableArray<T = any, U = any> implements Array<T> {
       findIndex: false,
       keys: false,
       values: false,
+      observableId: false,
     };
   }
 

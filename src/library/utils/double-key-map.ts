@@ -48,6 +48,19 @@ export class DoubleKeyMap<K = any, S = any, V = any> {
     return subMap.delete(subKey);
   }
 
+  deleteBySubKey(subKey: S): void {
+    let keys = this.outerMap.keys();
+
+    for (let key of keys) {
+      let subMap = this.outerMap.get(key);
+
+      if (subMap && subMap.has(subKey)) {
+        subMap.set(subKey, undefined as any);
+        // subMap.delete(subKey);
+      }
+    }
+  }
+
   getSubMap(key: K): Map<S, V> | undefined {
     return this.outerMap.get(key);
   }

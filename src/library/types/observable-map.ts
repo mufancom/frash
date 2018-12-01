@@ -11,6 +11,10 @@ export class ObservableMap<K = any, V = any> implements Map<K, V> {
   private _data: Map<K, V>;
 
   constructor(data?: Map<K, V> | ReadonlyArray<[K, V]>) {
+    Object.defineProperty(this, 'observableId', {
+      enumerable: false,
+    });
+
     if (data instanceof Map) {
       this._data = data;
     } else {

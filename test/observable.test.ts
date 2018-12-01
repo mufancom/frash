@@ -168,3 +168,192 @@ test('props1', () => {
 
   expect(totals).toEqual([36, 48]);
 });
+
+test('props2', () => {
+  let vat = observable.box(0.2);
+
+  class Order {
+    constructor() {
+      extendObservable(this, {
+        price: 20,
+        amount: 2,
+        get total() {
+          return (1 + vat.get()) * this.price * this.amount;
+          // tslint:disable-next-line
+        },
+      });
+    }
+  }
+
+  let order = new Order() as any;
+
+  expect(order.total).toBe(48);
+
+  order.price = 10;
+  order.amount = 3;
+
+  expect(order.total).toBe(36);
+});
+
+test('props4', () => {
+  class Bzz {
+    constructor() {
+      extendObservable(this, {
+        fluff: [1, 2],
+        get sum() {
+          return this.fluff.reduce((a: any, b: any) => a + b, 0);
+          // tslint:disable-next-line
+        },
+      });
+    }
+  }
+
+  let x = new Bzz() as any;
+
+  expect(x.sum).toBe(3);
+
+  x.fluff.push(3);
+
+  expect(x.sum).toBe(6);
+
+  x.fluff = [5, 6];
+
+  expect(x.sum).toBe(11);
+
+  x.fluff.push(2);
+
+  expect(x.sum).toBe(13);
+});
+
+test('object enumerable props', () => {
+  let x = observable({
+    a: 3,
+    get b() {
+      return 2 * this.a;
+      // tslint:disable-next-line
+    },
+  });
+
+  extendObservable(x, {c: 4});
+
+  let keys: string[] = [];
+
+  for (let key in x) {
+    keys.push(key);
+  }
+
+  expect(keys).toEqual(['a', 'c']);
+});
+
+test('observer property', () => {
+  let sb: any[] = [];
+  let mb: any[] = [];
+
+  class Wrapper {
+    constructor(chocolateBar: any) {
+      extendObservable(this, {
+        chocolateBar,
+        get calories() {
+          return this.chocolateBar.calories;
+          // tslint:disable-next-line
+        },
+      });
+    }
+  }
+
+  let snickers = observable<any>({
+    // tslint:disable-next-line
+    calories: null,
+  });
+
+  let mars = observable<any>({
+    calories: undefined,
+  });
+
+  let wrappedSnickers = new Wrapper(snickers) as any;
+  let wrappedMars = new Wrapper(mars) as any;
+
+  let disposeSnickers = autorun(() => {
+    sb.push(wrappedSnickers.calories);
+  });
+
+  let disposeMars = autorun(() => {
+    mb.push(wrappedMars.calories);
+  });
+
+  snickers.calories = 10;
+  mars.calories = 15;
+
+  disposeSnickers();
+  disposeMars();
+
+  snickers.calories = 5;
+  mars.calories = 7;
+
+  // tslint:disable-next-line
+  expect(sb).toEqual([null, 10]);
+  expect(mb).toEqual([undefined, 15]);
+});
+
+test('change count optimization', () => {
+  let bCalcs = 0;
+  let cCalcs = 0;
+
+  let a = observable.box(3);
+
+  let b = computed(() => {
+    bCalcs += 1;
+    return 4 + a.get() - a.get();
+  });
+
+  let c = computed(() => {
+    cCalcs += 1;
+    return b.get();
+  });
+
+  expect(b.get()).toBe(4);
+  expect(c.get()).toBe(4);
+  expect(bCalcs).toBe(1);
+  expect(cCalcs).toBe(1);
+
+  a.set(5);
+
+  expect(b.get()).toBe(4);
+  expect(c.get()).toBe(4);
+  expect(bCalcs).toBe(2);
+  expect(cCalcs).toBe(1);
+});
+
+test('observables removed', () => {
+  let calcs = 0;
+
+  let a = observable.box(1);
+  let b = observable.box(2);
+
+  let c = computed(() => {
+    calcs++;
+
+    if (a.get() === 1) {
+      return b.get() * a.get() * b.get();
+    }
+
+    return 3;
+  });
+
+  expect(calcs).toBe(0);
+  expect(c.get()).toBe(4);
+  expect(calcs).toBe(1);
+
+  a.set(2);
+
+  expect(c.get()).toBe(3);
+  expect(calcs).toBe(2);
+
+  b.set(3); // should not retrigger calc
+  expect(c.get()).toBe(3);
+  expect(calcs).toBe(2);
+
+  a.set(1);
+  expect(c.get()).toBe(9);
+  expect(calcs).toBe(3);
+});
