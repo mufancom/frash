@@ -1,6 +1,22 @@
 export class DoubleKeyMap<K = any, S = any, V = any> {
   private outerMap = new Map<K, Map<S, V>>();
 
+  [Symbol.iterator](): IterableIterator<[K, Map<S, V>]> {
+    return this.entries();
+  }
+
+  entries(): IterableIterator<[K, Map<S, V>]> {
+    return this.outerMap.entries();
+  }
+
+  keys(): IterableIterator<K> {
+    return this.outerMap.keys();
+  }
+
+  values(): IterableIterator<Map<S, V>> {
+    return this.outerMap.values();
+  }
+
   set(key: K, subKey: S, value: V): this {
     let subMap = this.outerMap.get(key);
 

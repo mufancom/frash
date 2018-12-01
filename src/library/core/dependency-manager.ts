@@ -23,6 +23,19 @@ class DependencyManager {
     return this.targetStack[this.observerStack.length - 1];
   }
 
+  // TODO: bimap optimization
+  getDependencyObservableIds(target: any): string[] {
+    let keys: string[] = [];
+
+    for (let [key, subMap] of this.observableMap) {
+      if (subMap.has(target)) {
+        keys.push(key);
+      }
+    }
+
+    return keys;
+  }
+
   trigger(observableId: string): void {
     let info = this.observableMap.getSubMap(observableId);
 
